@@ -7,8 +7,8 @@
     <ProjectGuid>{DC359C64-AC2B-42D4-BB3F-45FB6371EB37}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Streamline.Logger</RootNamespace>
-    <AssemblyName>Streamline.Logger</AssemblyName>
+    <RootNamespace>Streamline.Logging</RootNamespace>
+    <AssemblyName>Streamline.Logging</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

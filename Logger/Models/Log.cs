@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Streamline.Logger.Models
+namespace Streamline.Logging.Models
 {
     public class Log
     {
