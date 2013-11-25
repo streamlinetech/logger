@@ -13,6 +13,8 @@ namespace Streamline.Logging
         void Log(string message);
         void Log(string message, EntryType entryType);
         void Log(string message, string applicationName, string userName, EntryType entryType);
+        void Log(string message, string applicationName, string userName, string ipAddress, EntryType entryType);
+        void Log(Log log);
         void LogWithFormat(string message, params object[] args);
         void LogException(Exception ex);
     }
@@ -40,11 +42,21 @@ namespace Streamline.Logging
             Log(message, ApplicationName, UserName, entryType);
         }
 
-        public async void Log(string message, string applicationName, string userName, EntryType entryType)
+        public void Log(string message, string applicationName, string userName, EntryType entryType)
         {
-            var logs = FormatLogMessageToBreakApartBigMessages(message, applicationName, userName, entryType).ToList();
+            Log(message, applicationName, userName, string.Empty, entryType);
+        }
+
+        public async void Log(string message, string applicationName, string userName, string ipAddress, EntryType entryType)
+        {
+            var logs = FormatLogMessageToBreakApartBigMessages(message, applicationName, userName, entryType, ipAddress).ToList();
             foreach (var log in logs)
                 await PostLog(log);
+        }
+
+        public void Log(Log log)
+        {
+            Log(log.Message, log.ApplicationName, log.UserName, log.IpAddress, log.Type);
         }
 
         public void LogWithFormat(string message, params object[] args)
@@ -72,7 +84,7 @@ namespace Streamline.Logging
             }
         }
 
-        IEnumerable<Log> FormatLogMessageToBreakApartBigMessages(string message, string applicationName, string userName, EntryType entryType)
+        IEnumerable<Log> FormatLogMessageToBreakApartBigMessages(string message, string applicationName, string userName, EntryType entryType, string ipAddress)
         {
             var logMessage = message;
 
@@ -84,7 +96,8 @@ namespace Streamline.Logging
                     EnteredOn = DateTime.Now,
                     Message = new string(message.Skip(i * 4000).Take(4000).ToArray()),
                     Type = entryType,
-                    UserName = userName
+                    UserName = userName,
+                    IpAddress = ipAddress
                 };
             }
         }
