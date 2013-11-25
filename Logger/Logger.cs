@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Logger.Models;
+using Streamline.Logger.Models;
 
-namespace Logger
+namespace Streamline.Logger
 {
     public interface ILogger
     {

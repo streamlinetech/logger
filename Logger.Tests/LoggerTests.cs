@@ -8,7 +8,7 @@ namespace Logger.Tests
         [TestMethod]
         public void Log_Should_Post_Message_Less_Than_4000_Characters()
         {
-            var logger = new Logger("http://logging.api.stageweb2012.npc.local/v1/logs", "Logger Tests", "Logger");
+            var logger = new Streamline.Logger.Logger("http://logging.api.stageweb2012.npc.local/v1/logs", "Logger Tests", "Logger");
             logger.Log("Small Test Message 1");
         }
 
@@ -16,7 +16,7 @@ namespace Logger.Tests
         [TestMethod]
         public void Log_Should_Post_Message_Greater_Than_4000_Characters()
         {
-            var logger = new Logger("http://logging.api.stageweb2012.npc.local/v1/logs", "Logger Tests", "Logger");
+            var logger = new Streamline.Logger.Logger("http://logging.api.stageweb2012.npc.local/v1/logs", "Logger Tests", "Logger");
             var message = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur imperdiet ac libero vitae dictum. Vivamus velit nisi, tempor eget varius quis, mollis quis sem. Vivamus ut consectetur sapien, in condimentum nunc. Aenean nulla mi, euismod eu convallis et, viverra ut orci. Etiam accumsan mauris eget sodales ultrices. Quisque auctor, elit sed vulputate volutpat, arcu mi consectetur sem, eu adipiscing sapien dolor quis neque. Duis hendrerit nisl et blandit ultrices. Nulla facilisi. Suspendisse nec vulputate dolor. Sed pretium dictum quam, sit amet dignissim eros aliquam id. Nulla lacus nisi, volutpat eget mauris non, dapibus vestibulum mauris. Suspendisse augue augue, vestibulum eget eleifend vestibulum, lobortis non dolor. Donec pharetra a ipsum at tincidunt. Nunc sed sapien interdum, sagittis sem non, tincidunt nisi. Cras eleifend euismod orci. Aenean hendrerit nulla ut est tristique pharetra.
 
                     Aliquam vel fringilla ligula, ut convallis nibh. Nullam ultricies vestibulum arcu ac suscipit. Aliquam nec aliquet libero. Donec egestas nibh ut ipsum pulvinar, non mollis nulla fringilla. Aliquam a rhoncus nibh. Nullam auctor ligula leo, eu sagittis dolor lobortis at. Donec urna odio, posuere a viverra nec, vehicula a massa. Vivamus suscipit, enim vitae fringilla luctus, dui sem suscipit leo, ac porttitor mi sem eu dui. Suspendisse adipiscing condimentum diam et tincidunt. Sed placerat malesuada tincidunt. Fusce sagittis massa sed urna ornare, ut dapibus turpis facilisis. Nam vitae mollis est. Aenean rutrum condimentum ultrices. Cras vulputate nibh quis est mollis sodales.

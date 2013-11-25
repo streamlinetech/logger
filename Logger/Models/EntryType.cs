@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Logger.Models
+namespace Streamline.Logger.Models
 {
     [DataContract]
     public enum EntryType
