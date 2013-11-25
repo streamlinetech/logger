@@ -7,11 +7,11 @@ namespace Streamline.Logging.Models
     {
         [EnumMember]
         Information = 0,
-
         [EnumMember]
         Warning,
-
         [EnumMember]
-        Error
+        Error,
+        [EnumMember]
+        Verbose
     }
 }
