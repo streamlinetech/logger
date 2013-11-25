@@ -10,6 +10,9 @@
     <description>
       Logging client for the Logging Component.
     </description>
+    <dependencies>
+      <dependency id="Microsoft.AspNet.WebApi.Client" />
+    </dependencies>
   </metadata>
   <files />
 </package>
