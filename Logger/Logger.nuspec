@@ -11,7 +11,7 @@
       Logging client for the Logging Component.
     </description>
     <dependencies>
-      <dependency id="Microsoft.AspNet.WebApi.Client" />
+      <dependency id="Microsoft.AspNet.WebApi.Client" version="4.0.30506" />
     </dependencies>
   </metadata>
   <files />
