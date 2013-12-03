@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Streamline.Logging.Extensions;
+using Streamline.Logging.Helpers;
 using Streamline.Logging.Models;
 
 namespace Streamline.Logging
@@ -9,7 +9,7 @@ namespace Streamline.Logging
     {
         public void Log(string message)
         {
-
+            
         }
 
         public void Log(string message, EntryType entryType)

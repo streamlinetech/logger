@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
-using Streamline.Logging.Extensions;
+using Streamline.Logging.Helpers;
 using Streamline.Logging.Models;
 
 namespace Streamline.Logging

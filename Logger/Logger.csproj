@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultEmptyLogger.cs" />
-    <Compile Include="Extensions\TaskHelpers.cs" />
+    <Compile Include="Helpers\TaskHelpers.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Models\EntryType.cs" />
