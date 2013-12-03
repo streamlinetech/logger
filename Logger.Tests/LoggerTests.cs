@@ -8,15 +8,25 @@ namespace Logger.Tests
         [TestMethod]
         public void Log_Should_Post_Message_Less_Than_4000_Characters()
         {
-            var logger = new Streamline.Logging.Logger("http://logging.api.stageweb2012.npc.local/v1/logs", "Logger Tests", "Logger");
-            logger.Log("Small Test Message 1");
+            var logger = new Streamline.Logging.Logger("http://api-logging.npc.local/v1/logs", "Logger Tests", "Logger");
+            logger.LogAsync("Small Test Message 1").Wait();
+        }
+
+
+        [TestMethod]
+        public void Log_Should_Post_Message_Less_Than_4000_Characters_At_Least_10_Times()
+        {
+            var logger = new Streamline.Logging.Logger("http://api-logging.npc.local/v1/logs", "Logger Tests", "Logger");
+
+            for (var i = 0; i < 10; i++)
+                logger.LogAsync(string.Format("Small Test Message {0}", i)).Wait();
         }
 
 
         [TestMethod]
         public void Log_Should_Post_Message_Greater_Than_4000_Characters()
         {
-            var logger = new Streamline.Logging.Logger("http://logging.api.stageweb2012.npc.local/v1/logs", "Logger Tests", "Logger");
+            var logger = new Streamline.Logging.Logger("http://api-logging.npc.local/v1/logs", "Logger Tests", "Logger");
             var message = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur imperdiet ac libero vitae dictum. Vivamus velit nisi, tempor eget varius quis, mollis quis sem. Vivamus ut consectetur sapien, in condimentum nunc. Aenean nulla mi, euismod eu convallis et, viverra ut orci. Etiam accumsan mauris eget sodales ultrices. Quisque auctor, elit sed vulputate volutpat, arcu mi consectetur sem, eu adipiscing sapien dolor quis neque. Duis hendrerit nisl et blandit ultrices. Nulla facilisi. Suspendisse nec vulputate dolor. Sed pretium dictum quam, sit amet dignissim eros aliquam id. Nulla lacus nisi, volutpat eget mauris non, dapibus vestibulum mauris. Suspendisse augue augue, vestibulum eget eleifend vestibulum, lobortis non dolor. Donec pharetra a ipsum at tincidunt. Nunc sed sapien interdum, sagittis sem non, tincidunt nisi. Cras eleifend euismod orci. Aenean hendrerit nulla ut est tristique pharetra.
 
                     Aliquam vel fringilla ligula, ut convallis nibh. Nullam ultricies vestibulum arcu ac suscipit. Aliquam nec aliquet libero. Donec egestas nibh ut ipsum pulvinar, non mollis nulla fringilla. Aliquam a rhoncus nibh. Nullam auctor ligula leo, eu sagittis dolor lobortis at. Donec urna odio, posuere a viverra nec, vehicula a massa. Vivamus suscipit, enim vitae fringilla luctus, dui sem suscipit leo, ac porttitor mi sem eu dui. Suspendisse adipiscing condimentum diam et tincidunt. Sed placerat malesuada tincidunt. Fusce sagittis massa sed urna ornare, ut dapibus turpis facilisis. Nam vitae mollis est. Aenean rutrum condimentum ultrices. Cras vulputate nibh quis est mollis sodales.
@@ -52,7 +62,7 @@ namespace Logger.Tests
                     Praesent imperdiet magna pellentesque neque mattis, nec lobortis tellus euismod. Quisque at pretium tortor. Sed laoreet nibh leo, eu elementum ligula pretium eget. Fusce vel purus vitae ligula cursus ultrices. Donec auctor ipsum ac nisi eleifend, a suscipit nisi adipiscing. Sed semper justo et viverra adipiscing. Nulla consequat felis eu lectus ullamcorper, sit amet blandit tellus tempus. Nullam vel facilisis dui, ut tempor augue. Duis bibendum quis dolor a faucibus. Etiam id gravida augue. Vivamus diam purus, fringilla in tristique ut, accumsan vitae tortor. Curabitur a malesuada erat, ut placerat quam. Proin blandit lorem nec elementum suscipit. Sed sagittis, nibh a bibendum rhoncus, urna eros mollis est, quis ornare velit nulla sed tellus.";
 
             Assert.IsTrue(message.Length > 4000);
-            logger.Log(message);
+            logger.LogAsync(message).Wait();
         }
     }
 }

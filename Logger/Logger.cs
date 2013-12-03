@@ -17,13 +17,21 @@ namespace Streamline.Logging
         void Log(Log log);
         void LogWithFormat(string message, params object[] args);
         void LogException(Exception ex);
+
+        Task LogAsync(string message);
+        Task LogAsync(string message, EntryType entryType);
+        Task LogAsync(string message, string applicationName, string userName, EntryType entryType);
+        Task LogAsync(string message, string applicationName, string userName, string ipAddress, EntryType entryType);
+        Task LogAsync(Log log);
+        Task LogWithFormatAsync(string message, params object[] args);
+        Task LogExceptionAsync(Exception ex);
     }
 
     public class Logger : ILogger
     {
-        public string LoggingUrl { get; set; }
-        public string ApplicationName { get; set; }
-        public string UserName { get; set; }
+        protected string LoggingUrl { get; private set; }
+        protected string ApplicationName { get; private set; }
+        protected string UserName { get; private set; }
 
         public Logger(string loggingUrl, string applicationName, string userName)
         {
@@ -39,19 +47,19 @@ namespace Streamline.Logging
 
         public void Log(string message, EntryType entryType)
         {
-            Log(message, ApplicationName, UserName, entryType);
+            Log(message, entryType);
         }
 
         public void Log(string message, string applicationName, string userName, EntryType entryType)
         {
-            Log(message, applicationName, userName, string.Empty, entryType);
+            Log(message, applicationName, userName, entryType);
         }
 
-        public async void Log(string message, string applicationName, string userName, string ipAddress, EntryType entryType)
+        public void Log(string message, string applicationName, string userName, string ipAddress, EntryType entryType)
         {
             var logs = FormatLogMessageToBreakApartBigMessages(message, applicationName, userName, entryType, ipAddress).ToList();
             foreach (var log in logs)
-                await PostLog(log);
+                PostLogAsync(log).Wait();
         }
 
         public void Log(Log log)
@@ -84,6 +92,58 @@ namespace Streamline.Logging
             }
         }
 
+        public async Task LogAsync(string message)
+        {
+            await LogAsync(message, EntryType.Information);
+        }
+
+        public async Task LogAsync(string message, EntryType entryType)
+        {
+            await LogAsync(message, ApplicationName, UserName, entryType);
+        }
+
+        public async Task LogAsync(string message, string applicationName, string userName, EntryType entryType)
+        {
+            await LogAsync(message, applicationName, userName, string.Empty, entryType);
+        }
+
+        public async Task LogAsync(string message, string applicationName, string userName, string ipAddress, EntryType entryType)
+        {
+            var logs = FormatLogMessageToBreakApartBigMessages(message, applicationName, userName, entryType, ipAddress).ToList();
+            foreach (var log in logs)
+                await PostLogAsync(log);
+        }
+
+        public async Task LogAsync(Log log)
+        {
+            await LogAsync(log.Message, log.ApplicationName, log.UserName, log.IpAddress, log.Type);
+        }
+
+        public async Task LogWithFormatAsync(string message, params object[] args)
+        {
+            await LogAsync(string.Format(message, args));
+        }
+
+        public async Task LogExceptionAsync(Exception ex)
+        {
+            var output = new StringBuilder();
+            try
+            {
+                var exception = ex;
+                while (exception.InnerException != null)
+                {
+                    output.AppendLine(exception.Message);
+                    exception = exception.InnerException;
+                }
+
+                await LogAsync(output.ToString(), EntryType.Error);
+            }
+            finally
+            {
+                output = null;
+            }
+        }
+
         IEnumerable<Log> FormatLogMessageToBreakApartBigMessages(string message, string applicationName, string userName, EntryType entryType, string ipAddress)
         {
             var logMessage = message;
@@ -102,7 +162,7 @@ namespace Streamline.Logging
             }
         }
 
-        async Task PostLog(Log log)
+        async Task PostLogAsync(Log log)
         {
             try
             {
