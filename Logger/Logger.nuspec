@@ -5,7 +5,7 @@
     <authors>$author$</authors>
     <owners />
     <id>Streamline.Logger</id>
-    <title>Streamline's Logger for the Logging Component</title>
+    <title>Logger Client</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       Logging client for the Logging Component.
