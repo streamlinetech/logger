@@ -4,21 +4,42 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Streamline.Logging.Helpers;
 using Streamline.Logging.Models;
 
 namespace Streamline.Logging
 {
     public class Logger : ILogger
     {
+        public VerbosityKind Verbosity { get; set; }
         protected string LoggingUrl { get; private set; }
         protected string ApplicationName { get; private set; }
         protected string UserName { get; private set; }
 
-        public Logger(string loggingUrl, string applicationName, string userName)
+        IEnumerable<EntryType> LoggedEntityTypes
         {
-            LoggingUrl = loggingUrl;
+            get
+            {
+                return VerbosityHelper.GetEntityTypesForVerbosity(Verbosity);
+            }
+        }
+
+        public Logger(string loggingUrl, string applicationName, string userName)
+            : this(loggingUrl)
+        {
             ApplicationName = applicationName;
             UserName = userName;
+        }
+
+        public Logger(string loggingUrl)
+        {
+            LoggingUrl = loggingUrl;
+        }
+
+        public Logger(string loggingUrl, VerbosityKind verbosity)
+            : this(loggingUrl)
+        {
+            Verbosity = verbosity;
         }
 
         public void Log(string message)
@@ -145,14 +166,17 @@ namespace Streamline.Logging
 
         async Task PostLogAsync(Log log)
         {
-            try
+            if (LoggedEntityTypes.Contains(log.Type))
             {
-                using (var httpClient = new HttpClient())
+                try
                 {
-                    await httpClient.PostAsJsonAsync(LoggingUrl, log);
+                    using (var httpClient = new HttpClient())
+                        await httpClient.PostAsJsonAsync(LoggingUrl, log);
                 }
+                catch { }
             }
-            catch { }
+            else
+                await TaskHelpers.Empty;
         }
     }
 }

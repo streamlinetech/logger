@@ -9,7 +9,7 @@ namespace Streamline.Logging
     {
         public void Log(string message)
         {
-            
+
         }
 
         public void Log(string message, EntryType entryType)

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Streamline.Logging.Helpers;
@@ -9,6 +11,27 @@ namespace Streamline.Logging
 {
     public class TraceLogger : ILogger
     {
+        public VerbosityKind Verbosity { get; set; }
+
+        IEnumerable<EntryType> LoggedEntityTypes
+        {
+            get
+            {
+                return VerbosityHelper.GetEntityTypesForVerbosity(Verbosity);
+            }
+        }
+
+        public TraceLogger()
+            : this(VerbosityKind.Normal)
+        {
+
+        }
+
+        public TraceLogger(VerbosityKind verbosity)
+        {
+            Verbosity = verbosity;
+        }
+
         public void Log(string message)
         {
             Log(message, EntryType.Information);
@@ -39,8 +62,11 @@ namespace Streamline.Logging
 
         public void Log(Log log)
         {
-            var message = string.Format("{0} - {1}: {2}", DateTime.Now, log.ApplicationName, log.Message);
-            Trace.WriteLine(message);
+            if (LoggedEntityTypes.Contains(log.Type))
+            {
+                var message = string.Format("{0} - {1}: {2}", DateTime.Now, log.ApplicationName, log.Message);
+                Trace.WriteLine(message);
+            }
         }
 
         public void LogWithFormat(string message, params object[] args)
@@ -91,13 +117,18 @@ namespace Streamline.Logging
 
         public async Task LogAsync(Log log)
         {
-            try
+            if (LoggedEntityTypes.Contains(log.Type))
             {
-                var message = string.Format("{0} - {1}: {2}", DateTime.Now, log.ApplicationName, log.Message);
-                Trace.WriteLine(message);
-                await TaskHelpers.Empty;
+                try
+                {
+                    var message = string.Format("{0} - {1}: {2}", DateTime.Now, log.ApplicationName, log.Message);
+                    Trace.WriteLine(message);
+                    await TaskHelpers.Empty;
+                }
+                catch
+                {
+                }
             }
-            catch { }
         }
 
         public async Task LogWithFormatAsync(string message, params object[] args)
