@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Streamline.Logging.Helpers;
 using Streamline.Logging.Models;
 
-namespace Streamline.Logging
+namespace Streamline.Logging.Infrastructure
 {
-    public class Logger : ILogger
+    public abstract class AbstractLogger : ILogger
     {
-        public VerbosityKind Verbosity { get; set; }
+        protected VerbosityKind Verbosity { get; set; }
         protected string LoggingUrl { get; private set; }
         protected string ApplicationName { get; private set; }
         protected string UserName { get; private set; }
@@ -24,21 +23,11 @@ namespace Streamline.Logging
             }
         }
 
-        public Logger(string loggingUrl, string applicationName, string userName)
-            : this(loggingUrl)
-        {
-            ApplicationName = applicationName;
-            UserName = userName;
-        }
-
-        public Logger(string loggingUrl)
+        public AbstractLogger(string loggingUrl = null, string applicationName = null, string userName = null, VerbosityKind verbosity = VerbosityKind.Normal)
         {
             LoggingUrl = loggingUrl;
-        }
-
-        public Logger(string loggingUrl, VerbosityKind verbosity)
-            : this(loggingUrl)
-        {
+            ApplicationName = applicationName;
+            UserName = userName;
             Verbosity = verbosity;
         }
 
@@ -49,19 +38,19 @@ namespace Streamline.Logging
 
         public void Log(string message, EntryType entryType)
         {
-            Log(message, entryType);
+            Log(message, ApplicationName, UserName, entryType);
         }
 
         public void Log(string message, string applicationName, string userName, EntryType entryType)
         {
-            Log(message, applicationName, userName, entryType);
+            Log(message, applicationName, userName, string.Empty, entryType);
         }
 
         public void Log(string message, string applicationName, string userName, string ipAddress, EntryType entryType)
         {
             var logs = FormatLogMessageToBreakApartBigMessages(message, applicationName, userName, entryType, ipAddress).ToList();
             foreach (var log in logs)
-                PostLogAsync(log).Wait();
+                SaveAsync(log).Wait();
         }
 
         public void Log(Log log)
@@ -111,9 +100,14 @@ namespace Streamline.Logging
 
         public async Task LogAsync(string message, string applicationName, string userName, string ipAddress, EntryType entryType)
         {
-            var logs = FormatLogMessageToBreakApartBigMessages(message, applicationName, userName, entryType, ipAddress).ToList();
-            foreach (var log in logs)
-                await PostLogAsync(log);
+            if (CanSaveLogPerVerbosity(entryType))
+            {
+                var logs = FormatLogMessageToBreakApartBigMessages(message, applicationName, userName, entryType, ipAddress).ToList();
+                foreach (var log in logs)
+                    await SaveAsync(log);
+            }
+            else
+                await TaskHelpers.Empty;
         }
 
         public async Task LogAsync(Log log)
@@ -149,34 +143,23 @@ namespace Streamline.Logging
         IEnumerable<Log> FormatLogMessageToBreakApartBigMessages(string message, string applicationName, string userName, EntryType entryType, string ipAddress)
         {
             var logMessage = message;
-
             for (var i = 0; i < (int)Math.Ceiling(message.Length / 4000f); i++)
-            {
                 yield return new Log()
-                {
-                    ApplicationName = applicationName,
-                    EnteredOn = DateTime.Now,
-                    Message = new string(message.Skip(i * 4000).Take(4000).ToArray()),
-                    Type = entryType,
-                    UserName = userName,
-                    IpAddress = ipAddress
-                };
-            }
+                             {
+                                 ApplicationName = applicationName,
+                                 EnteredOn = DateTime.Now,
+                                 Message = new string(logMessage.Skip(i * 4000).Take(4000).ToArray()),
+                                 Type = entryType,
+                                 UserName = userName,
+                                 IpAddress = ipAddress
+                             };
         }
 
-        async Task PostLogAsync(Log log)
+        protected abstract Task SaveAsync(Log log);
+
+        bool CanSaveLogPerVerbosity(EntryType entryType)
         {
-            if (LoggedEntityTypes.Contains(log.Type))
-            {
-                try
-                {
-                    using (var httpClient = new HttpClient())
-                        await httpClient.PostAsJsonAsync(LoggingUrl, log);
-                }
-                catch { }
-            }
-            else
-                await TaskHelpers.Empty;
+            return LoggedEntityTypes.Contains(entryType);
         }
     }
 }
